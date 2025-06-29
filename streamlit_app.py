@@ -46,6 +46,7 @@ if st.button("Compute Best Route"):
                         st.write(f"**Expected Amount**: {step.get('expectedAmount')}")
                         st.write(f"**Efficiency**: {step.get('efficiency'):.4%}")
                         st.write(f"**Execution Time**: {step.get('time')} seconds")
+                        st.write(f"**Jumper Link**: {step.get('link')}")
 
                 if alternatives:
                     st.subheader("💡 Alternative Routes")
@@ -53,7 +54,7 @@ if st.button("Compute Best Route"):
                         with st.expander(f"{alt['type']} - Efficiency: {alt['efficiency']}"):
                             st.write(alt["description"])
                             for j, step in enumerate(alt["steps"], 1):
-                                st.write(f"- Step {j}: {step.get('tool', 'N/A')}, Expected: {step.get('expectedAmount')}, Efficiency: {step.get('efficiency'):.4%}, Time: {step.get('time')}s")
+                                st.write(f"- Step {j}: {step.get('tool', 'N/A')}, Expected: {step.get('expectedAmount')}, Efficiency: {step.get('efficiency'):.4%}, Time: {step.get('time')}s, Jumper Link:{step.get('link')} ")
 
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
