@@ -18,8 +18,9 @@ with col2:
 amount = st.number_input("Amount to Send", min_value=0.0, step=0.1, value=1.0)
 
 # Selection for route preference
+st.markdown("**Route Preference**")
 route_preference = st.radio(
-    "Route Preference",
+    " We still search for the best overall return but this selection is used to chose whether we go through the fastest or cheapest intermediary steps",
     options=["CHEAPEST", "FASTEST"],
     index=0,
     horizontal=True
