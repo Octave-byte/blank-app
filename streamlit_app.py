@@ -2,7 +2,7 @@ import streamlit as st
 from routing.route_finder import find_best_routes_parallel
 
 # Allowed chains
-CHAIN_OPTIONS = ["Ethereum", "Base", "Arbitrum", "Polygon", "Berachain", "Gnosis", "Optimism"]
+CHAIN_OPTIONS = ["Ethereum", "Base", "Arbitrum", "Polygon", "Berachain", "Gnosis", "Optimism", "Lisk", "Taiko", "Rootstock", "Sonic", "Soneium", "Corn"]
 
 st.title("Jumper Route Finder")
 
@@ -13,10 +13,17 @@ with col1:
     src_token = st.text_input("Source Token (symbol or address)", value="USDC")
 with col2:
     dst_chain = st.selectbox("Destination Chain", CHAIN_OPTIONS)
-    dst_token = st.text_input("Destination Token (symbol or address)", value="USDC")
+    dst_token = st.text_input("Destination Token (symbol or address)", value="ETH")
 
 amount = st.number_input("Amount to Send", min_value=0.0, step=0.1, value=1.0)
 
+# Selection for route preference
+route_preference = st.radio(
+    "Route Preference",
+    options=["CHEAPEST", "FASTEST"],
+    index=0,
+    horizontal=True
+)
 
 if st.button("Compute Best Route"):
 
@@ -28,7 +35,8 @@ if st.button("Compute Best Route"):
                 dst_chain_name=dst_chain,
                 src_token=src_token,
                 dst_token=dst_token,
-                amount=amount
+                amount=amount,
+                order = route_preference
             )
 
             best = result.get("best")

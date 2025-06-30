@@ -114,12 +114,12 @@ def resolve_transfer_details(src_chain_name, dst_chain_name, src_token_symbol, d
         "dst_token_address": dst_token_address,
         "sending_amount": sending_amount_raw,
         "price_from_amount": src_price,
-        "price_to_amount": dst_price
+        "price_to_amount": dst_price,
     }
 
 
 
-def jumper_quote(originChain, destinationChain, originToken, destinationToken, amount, price_from_amount, price_to_amount):
+def jumper_quote(originChain, destinationChain, originToken, destinationToken, amount, price_from_amount, price_to_amount, order):
 
     from_address = get_default_address_for_chain(originChain)
     to_address = get_default_address_for_chain(destinationChain)
@@ -131,7 +131,8 @@ def jumper_quote(originChain, destinationChain, originToken, destinationToken, a
         "toToken": destinationToken,
         "fromAddress": from_address,
         "toAddress": to_address,
-        "fromAmount": int(amount)
+        "fromAmount": int(amount),
+        "order": order
     }
 
     lifi_response = requests.get(
@@ -167,7 +168,7 @@ def jumper_quote(originChain, destinationChain, originToken, destinationToken, a
     else:
         return {}
 
-def run_multistep_route(route_plan, initial_amount):
+def run_multistep_route(route_plan, initial_amount, order):
         steps = []
         current_amount = initial_amount
         total_time = 0
@@ -185,7 +186,8 @@ def run_multistep_route(route_plan, initial_amount):
                     destinationToken=details["dst_token_address"],
                     amount=details["sending_amount"],
                     price_from_amount=details["price_from_amount"],
-                    price_to_amount=details["price_to_amount"]
+                    price_to_amount=details["price_to_amount"],
+                    order = order
                 )
                 print(quote)
                 steps.append(quote)
@@ -210,7 +212,7 @@ def run_multistep_route(route_plan, initial_amount):
         }
 
 
-def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amount):
+def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amount, order):
     
     base_chain = "Base"
     base_native = get_native_token_address(base_chain)
@@ -220,7 +222,7 @@ def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amoun
     # 1. Direct
     direct_route = run_multistep_route([
         (src_chain_name, dst_chain_name, src_token, dst_token)
-    ], amount)
+    ], amount, order)
 
     if direct_route:
         return {
@@ -237,7 +239,7 @@ def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amoun
     if dst_token != dst_native:
         native_plan.append((dst_chain_name, dst_chain_name, dst_native, dst_token))
 
-    native_route = run_multistep_route(native_plan, amount)
+    native_route = run_multistep_route(native_plan, amount, order)
     if native_route and len(native_route["steps"]) >= 2:
         return {
             "type": "native_bridge",
@@ -250,7 +252,7 @@ def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amoun
         base_direct_route = run_multistep_route([
             (src_chain_name, base_chain, src_token, base_native),
             (base_chain, dst_chain_name, base_native, dst_token)
-        ], amount)
+        ], amount, order)
         if base_direct_route:
             return {
                 "type": "via_base_direct",
@@ -268,7 +270,7 @@ def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amoun
         if dst_token != dst_native:
             base_native_plan.append((dst_chain_name, dst_chain_name, dst_native, dst_token))
 
-        base_native_route = run_multistep_route(base_native_plan, amount)
+        base_native_route = run_multistep_route(base_native_plan, amount, order)
         if base_native_route and len(base_native_route["steps"]) >= 3:
             return {
                 "type": "via_base_with_native",
@@ -288,7 +290,7 @@ def find_best_routes(src_chain_name, dst_chain_name, src_token, dst_token, amoun
 
 
 
-def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_token, amount):
+def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_token, amount, order):
     base_chain = "Base"
     base_native = get_native_token_address(base_chain)
     src_native = get_native_token_address(src_chain_name)
@@ -306,7 +308,7 @@ def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_tok
             "description": "Direct quote found.",
             **run_multistep_route([
                 (src_chain_name, dst_chain_name, src_token, dst_token)
-            ], amount)
+            ], amount, order)
         }
 
     def strategy_native_bridge():
@@ -317,7 +319,7 @@ def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_tok
         if dst_token != dst_native:
             plan.append((dst_chain_name, dst_chain_name, dst_native, dst_token))
 
-        result = run_multistep_route(plan, amount)
+        result = run_multistep_route(plan, amount, order)
         if result and len(result["steps"]) >= 2:
             return {
                 "type": "native_bridge",
@@ -332,7 +334,7 @@ def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_tok
             (src_chain_name, base_chain, src_token, base_native),
             (base_chain, dst_chain_name, base_native, dst_token)
         ]
-        result = run_multistep_route(plan, amount)
+        result = run_multistep_route(plan, amount, order)
         if result:
             return {
                 "type": "via_base_direct",
@@ -351,7 +353,7 @@ def find_best_routes_parallel(src_chain_name, dst_chain_name, src_token, dst_tok
         if dst_token != dst_native:
             plan.append((dst_chain_name, dst_chain_name, dst_native, dst_token))
 
-        result = run_multistep_route(plan, amount)
+        result = run_multistep_route(plan, amount, order)
         if result and len(result["steps"]) >= 3:
             return {
                 "type": "via_base_with_native",
