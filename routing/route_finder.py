@@ -32,8 +32,8 @@ def is_address_format(token: str):
     return False
 
 def resolve_token(chain_id, token_input):
-    if is_address_format(token_input):
-        return token_input, None
+    #if is_address_format(token_input):
+    #    return token_input, None
     # Otherwise, it's a symbol — resolve via API
     token_resp = requests.get(
         f"https://li.quest/v1/token?chain={chain_id}&token={token_input}",

@@ -52,9 +52,14 @@ if st.button("Compute Best Route"):
 
                 # ➕ Total efficiency and time for best route
                 total_best_time = sum(step.get("time", 0) for step in best["steps"])
-                total_best_efficiency = sum(step.get("efficiency", 0) for step in best["steps"])
 
-                st.write(f"**Total Efficiency**: {total_best_efficiency:.2%}")
+                efficiencies = [step.get("efficiency") for step in best["steps"] if "efficiency" in step]
+                if efficiencies:
+                    average_efficiency = sum(efficiencies) / len(efficiencies)
+                else:
+                    average_efficiency = None
+
+                st.write(f"**Total Efficiency**: {average_efficiency:.2%}")
                 st.write(f"**Total Estimated Time**: {total_best_time:.2f} seconds")
 
                 for i, step in enumerate(best["steps"], 1):
