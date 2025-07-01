@@ -2,7 +2,7 @@ import streamlit as st
 from routing.route_finder import find_best_routes_parallel
 
 # Allowed chains
-CHAIN_OPTIONS = ["Gnosis","Ethereum", "Base", "Arbitrum", "Polygon", "Berachain", "Optimism", "Lisk", "Taiko", "Rootstock", "Sonic", "Soneium", "Corn"]
+CHAIN_OPTIONS = ["Gnosis","Ethereum", "Solana", "Sui", "Base", "Arbitrum", "Polygon", "Berachain", "Optimism", "Lisk", "Taiko", "Rootstock", "Sonic", "Soneium", "Bitcoin", "Corn"]
 
 st.title("Jumper Route Finder")
 
