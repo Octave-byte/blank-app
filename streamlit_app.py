@@ -3,7 +3,7 @@ import math
 from routing.route_finder import find_best_routes_parallel
 
 # Allowed chains
-CHAIN_OPTIONS = ["Gnosis","Ethereum", "Solana","Abstract", "Sei", "Sui", "Base", "Arbitrum", "Polygon", "Berachain", "Optimism", "Lisk", "Taiko", "Rootstock", "Sonic", "Soneium", "Bitcoin", "Avalanche", "BSC", "HyperEVM", "Corn", "Ink","Superposition"]
+CHAIN_OPTIONS = ["Gnosis","Ethereum", "Solana","Abstract", "Unichain", "Sei", "Sui", "Base", "Arbitrum", "Polygon", "Berachain", "Optimism", "Lisk", "Taiko", "Rootstock", "Sonic", "Soneium", "Bitcoin", "Avalanche", "BSC", "HyperEVM", "Corn", "Ink","Superposition"]
 
 st.title("Jumper Route Finder")
 
